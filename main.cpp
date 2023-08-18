@@ -5,7 +5,8 @@
 #include <ctime>
 #include <cstdio>
 #include <iomanip>
-
+#include <filesystem>
+// #include <experimental/filesystem> // Use this header for filesystem operations
 #include <opencv2/core.hpp>
 #include <opencv2/core/types_c.h>
 #include <opencv2/core/utility.hpp>
@@ -17,6 +18,9 @@
 
 using namespace std;
 using namespace cv;
+// namespace fs = std::experimental::filesystem; // Use the experimental::filesystem namespace
+namespace fs = std::filesystem; // Use the std::filesystem namespace
+
 
 int main()
 {
@@ -25,24 +29,27 @@ int main()
     /************************************************************************
     读取每一幅图像，从中提取出角点，然后对角点进行亚像素精确化
     *************************************************************************/
+    string imageFolderPath = "/home/aicrobo/code/fisheye_opencv/image_path/images/"; // Change this to the folder containing your images
     cout << "开始提取角点………………" << endl;
     int image_count = 14;                    /****    图像数量     ****/
-    Size board_size = Size(9, 6);            /****    定标板上每行、列的角点数       ****/
+    Size board_size = Size(8, 11);            /****    定标板上每行、列的角点数       ****/
     vector<Point2f> corners;                  /****    缓存每幅图像上检测到的角点       ****/
     vector<vector<Point2f>>  corners_Seq;    /****  保存检测到的所有角点       ****/
     vector<Mat>  image_Seq;
     int successImageNum = 0;				/****	成功提取角点的棋盘图数量	****/
 
     int count = 0;
-    for (int i = 0; i != image_count; i++)
+    int f = 0;
+    for (const auto& entry : fs::directory_iterator(imageFolderPath))
     {
-        cout << "Frame #" << i + 1 << "..." << endl;
-        string imageFileName;
-        std::stringstream StrStm;
-        StrStm << i + 1;
-        StrStm >> imageFileName;
-        imageFileName += ".jpg";
-        cv::Mat image = imread("img" + imageFileName);
+        string imageFilePath = entry.path().string();
+        cout << "Processing: " << imageFilePath << endl;
+        cv::Mat image = imread(imageFilePath);
+        if (image.empty())
+        {
+            cout << "Failed to read image: " << imageFilePath << endl;
+            continue;
+        }
         /* 提取角点 */
         cv::Mat imageGray;
         cvtColor(image, imageGray, COLOR_BGR2GRAY);
@@ -63,14 +70,13 @@ int main()
             for (int j = 0; j < corners.size(); j++)
             {
                 circle(imageTemp, corners[j], 10, Scalar(0, 0, 255), 2, 8, 0);
-            }
-            string imageFileName;
-            std::stringstream StrStm;
-            StrStm << i + 1;
-            StrStm >> imageFileName;
+            }    std::stringstream ss;
+            ss << f++;
+            std::string str = ss.str();
+            string imageFileName = "/home/aicrobo/code/fisheye_opencv/image_path/image_2/"+str;
             imageFileName += "_corner.jpg";
             imwrite(imageFileName, imageTemp);
-            cout << "Frame corner#" << i + 1 << "...end" << endl;
+            // cout << "Frame corner#" << i + 1 << "...end" << endl;
 
             count = count + corners.size();
             successImageNum = successImageNum + 1;
@@ -123,7 +129,7 @@ int main()
     fisheye::calibrate(object_Points, corners_Seq, image_size, intrinsic_matrix, distortion_coeffs, rotation_vectors, translation_vectors, flags, cv::TermCriteria(3, 20, 1e-6));
     cout << "定标完成！\n";
 
-    string datFileName = "C:\\Users\\kx2016422\\Desktop\\camParam.dat";
+    string datFileName = "/home/aicrobo/code/fisheye_opencv/dist_path/camParam.dat";
     FILE *camParam = fopen(datFileName.c_str(), "wb");
     if (camParam == NULL) {
         std::cout << "can not create data file: " << datFileName.c_str() << " !!!" << std::endl;
@@ -224,14 +230,14 @@ int main()
     if (1)
     {
         Mat newCameraMatrix = Mat(3, 3, CV_32FC1, Scalar::all(0));
-        Mat testImage = imread("a.jpg", 1);
+        Mat testImage = imread("/home/aicrobo/code/fisheye_opencv/image_path/images/img1.jpg", 1);
 
         cv::Matx33d intrinsic_matrix;
         cv::Vec4d distortion_coeffs;
         Size image_size;
 
 
-        string datFileName = "C:\\Users\\zzy\\Desktop\\camParam.dat";
+        string datFileName = "/home/aicrobo/code/fisheye_opencv/dist_path/camParam.dat";
 
         FILE *camParam = fopen(datFileName.c_str(), "rb");
         if (camParam == NULL) {
