@@ -29,7 +29,7 @@ int main()
     /************************************************************************
     读取每一幅图像，从中提取出角点，然后对角点进行亚像素精确化
     *************************************************************************/
-    string imageFolderPath = "/home/aicrobo/code/fisheye_opencv/image_path/images/"; // Change this to the folder containing your images
+    string imageFolderPath = "../image_path/images/"; // Change this to the folder containing your images
     cout << "开始提取角点………………" << endl;
     int image_count = 14;                    /****    图像数量     ****/
     Size board_size = Size(8, 11);            /****    定标板上每行、列的角点数       ****/
@@ -73,7 +73,7 @@ int main()
             }    std::stringstream ss;
             ss << f++;
             std::string str = ss.str();
-            string imageFileName = "/home/aicrobo/code/fisheye_opencv/image_path/image_2/"+str;
+            string imageFileName = "../image_path/image_2/"+str;
             imageFileName += "_corner.jpg";
             imwrite(imageFileName, imageTemp);
             // cout << "Frame corner#" << i + 1 << "...end" << endl;
@@ -129,7 +129,7 @@ int main()
     fisheye::calibrate(object_Points, corners_Seq, image_size, intrinsic_matrix, distortion_coeffs, rotation_vectors, translation_vectors, flags, cv::TermCriteria(3, 20, 1e-6));
     cout << "定标完成！\n";
 
-    string datFileName = "/home/aicrobo/code/fisheye_opencv/dist_path/camParam.dat";
+    string datFileName = "../image_path/camParam.dat";
     FILE *camParam = fopen(datFileName.c_str(), "wb");
     if (camParam == NULL) {
         std::cout << "can not create data file: " << datFileName.c_str() << " !!!" << std::endl;
@@ -230,14 +230,14 @@ int main()
     if (1)
     {
         Mat newCameraMatrix = Mat(3, 3, CV_32FC1, Scalar::all(0));
-        Mat testImage = imread("/home/aicrobo/code/fisheye_opencv/image_path/images/img1.jpg", 1);
+        Mat testImage = imread("../image_path/images/img1.jpg", 1);
 
         cv::Matx33d intrinsic_matrix;
         cv::Vec4d distortion_coeffs;
         Size image_size;
 
 
-        string datFileName = "/home/aicrobo/code/fisheye_opencv/dist_path/camParam.dat";
+        string datFileName = "../image_path/camParam.dat";
 
         FILE *camParam = fopen(datFileName.c_str(), "rb");
         if (camParam == NULL) {
