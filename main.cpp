@@ -29,7 +29,7 @@ int main()
     /************************************************************************
     读取每一幅图像，从中提取出角点，然后对角点进行亚像素精确化
     *************************************************************************/
-    string imageFolderPath = "/home/philtell/code/fisheye_opencv/image_path/images/"; // Change this to the folder containing your images
+    string imageFolderPath = "../image_path/images/"; // Change this to the folder containing your images
     cout << "开始提取角点………………" << endl;
     int image_count = 14;                    /****    图像数量     ****/
     Size board_size = Size(6, 9);            /****    定标板上每行、列的角点数       ****/
